@@ -1,0 +1,1631 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#fdf8f4]">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mimo Gift - Crea un Regalo Digital Inolvidable</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        mimo: {
+                            bg: '#fdf8f4',
+                            card: '#ffffff',
+                            primary: '#d97757',
+                            primaryHover: '#c86b58',
+                            secondary: '#f7e7df',
+                            text: '#2d2727',
+                            muted: '#7a706e',
+                            border: '#ebdcd5',
+                            accent: '#e29578'
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['Playfair Display', 'Georgia', 'serif'],
+                        sans: ['Inter', 'system-ui', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Leaflet JS & CSS for interactive maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- Canvas Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            color: #2d2727;
+            background-color: #fdf8f4;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, .font-serif-title {
+            font-family: 'Playfair Display', Georgia, serif;
+        }
+
+        /* Smooth custom transitions */
+        .fade-in {
+            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Pulse heart animation */
+        @keyframes pulseHeart {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.18); }
+        }
+
+        .animate-heartbeat {
+            animation: pulseHeart 1.4s infinite ease-in-out;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #fdf8f4;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #e29578;
+            border-radius: 9999px;
+        }
+
+        /* Published Theme Variations */
+        .theme-atardecer {
+            --bg-main: #fdf8f4;
+            --card-bg: #ffffff;
+            --accent-color: #d97757;
+            --text-color: #2d2727;
+            --gradient-header: linear-gradient(135deg, #fceade 0%, #f7d6c8 100%);
+        }
+        .theme-noche {
+            --bg-main: #0f172a;
+            --card-bg: #1e293b;
+            --accent-color: #f43f5e;
+            --text-color: #f8fafc;
+            --gradient-header: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+        }
+        .theme-rosa {
+            --bg-main: #fff5f7;
+            --card-bg: #ffffff;
+            --accent-color: #e11d48;
+            --text-color: #331018;
+            --gradient-header: linear-gradient(135deg, #ffe4e6 0%, #fecdd3 100%);
+        }
+        .theme-jardin {
+            --bg-main: #f4f7f4;
+            --card-bg: #ffffff;
+            --accent-color: #2e6f40;
+            --text-color: #1a2e20;
+            --gradient-header: linear-gradient(135deg, #e2efe4 0%, #cce3cf 100%);
+        }
+
+        /* Floating background hearts animation */
+        .floating-heart {
+            position: fixed;
+            pointer-events: none;
+            z-index: 0;
+            animation: floatUp 8s linear infinite;
+            opacity: 0.6;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) scale(0.5) rotate(0deg); opacity: 0; }
+            20% { opacity: 0.7; }
+            80% { opacity: 0.7; }
+            100% { transform: translateY(-10vh) scale(1.2) rotate(360deg); opacity: 0; }
+        }
+    </style>
+</head>
+
+<body class="min-h-full flex flex-col justify-between antialiased selection:bg-mimo-primary selection:text-white">
+
+    <!-- Floating Background Decorator Container -->
+    <div id="floatingHeartsContainer" class="fixed inset-0 pointer-events-none overflow-hidden z-0"></div>
+
+    <!-- Top Header -->
+    <header class="sticky top-0 z-40 bg-[#fdf8f4]/90 backdrop-blur-md border-b border-mimo-border px-4 py-3 transition-all duration-300">
+        <div class="max-w-3xl mx-auto flex items-center justify-between">
+            <!-- Brand Logo -->
+            <div class="flex items-center gap-2 cursor-pointer" onclick="goToStep(0)">
+                <span class="bg-mimo-primary text-white w-8 h-8 rounded-full flex items-center justify-center text-sm shadow-sm">
+                    <i class="fa-solid fa-heart animate-heartbeat"></i>
+                </span>
+                <span class="font-serif text-xl font-bold tracking-tight text-mimo-text">Mimo<span class="text-mimo-primary">Gift</span></span>
+            </div>
+
+            <!-- Indicator & Step Pill -->
+            <div id="headerProgressContainer" class="flex items-center gap-3">
+                <div class="hidden sm:flex flex-col items-end">
+                    <span id="stepTitleIndicator" class="text-xs font-semibold text-mimo-muted uppercase tracking-wider">Paso 1 de 12</span>
+                    <span id="recipientBadge" class="text-xs font-medium text-mimo-primary bg-mimo-secondary px-2 py-0.5 rounded-full">❤️ Pareja</span>
+                </div>
+                <div class="w-28 sm:w-36 h-2.5 bg-mimo-secondary rounded-full overflow-hidden p-0.5 border border-mimo-border">
+                    <div id="progressBar" class="h-full bg-mimo-primary rounded-full transition-all duration-500 ease-out" style="width: 8%;"></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 max-w-3xl w-full mx-auto px-4 py-6 z-10">
+        <div id="appContainer" class="w-full">
+            <!-- Dynamic step contents will render here via JS -->
+        </div>
+    </main>
+
+    <!-- Bottom Fixed Navigation Footer -->
+    <footer id="bottomNav" class="sticky bottom-0 z-40 bg-white/95 backdrop-blur-md border-t border-mimo-border px-4 py-3 shadow-lg">
+        <div class="max-w-3xl mx-auto flex items-center justify-between gap-3">
+            <!-- Back Button -->
+            <button id="btnBack" onclick="prevStep()" class="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-mimo-border text-mimo-muted font-medium hover:bg-mimo-bg hover:text-mimo-text transition text-sm">
+                <i class="fa-solid fa-arrow-left text-xs"></i>
+                <span>Atrás</span>
+            </button>
+
+            <!-- Center Quick Preview Trigger -->
+            <button id="btnPreviewModal" onclick="openQuickPreviewModal()" class="flex items-center gap-1.5 px-3 py-2 rounded-xl text-mimo-primary bg-mimo-secondary/60 hover:bg-mimo-secondary text-xs font-medium transition">
+                <i class="fa-solid fa-eye"></i>
+                <span class="hidden sm:inline">Vista Previa</span>
+            </button>
+
+            <!-- Main Next / Action Button -->
+            <button id="btnNext" onclick="nextStep()" class="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-mimo-primary text-white font-semibold hover:bg-mimo-primaryHover transition shadow-md shadow-mimo-primary/20 text-sm">
+                <span id="btnNextText">Continuar</span>
+                <i id="btnNextIcon" class="fa-solid fa-arrow-right text-xs"></i>
+            </button>
+        </div>
+    </footer>
+
+    <!-- Modal: Quick Live Preview -->
+    <div id="quickPreviewModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden">
+        <div class="bg-white rounded-2xl max-w-md w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden border border-mimo-border animate-fadeIn">
+            <div class="bg-mimo-bg p-4 border-b border-mimo-border flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-mobile-screen text-mimo-primary"></i>
+                    <h3 class="font-serif font-bold text-mimo-text text-base">Vista Previa Rápida</h3>
+                </div>
+                <button onclick="closeQuickPreviewModal()" class="text-mimo-muted hover:text-mimo-text p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <div class="p-6 overflow-y-auto flex-1 space-y-4" id="quickPreviewContent">
+                <!-- Live preview details populate dynamically -->
+            </div>
+            <div class="p-3 bg-mimo-bg border-t border-mimo-border text-center">
+                <button onclick="closeQuickPreviewModal()" class="w-full py-2 bg-mimo-primary text-white rounded-xl font-medium text-sm">
+                    Seguir Editando
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Notification / Alert Custom Message -->
+    <div id="customAlertModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs hidden">
+        <div class="bg-white rounded-2xl max-w-xs w-full p-5 text-center shadow-2xl border border-mimo-border">
+            <div id="customAlertIcon" class="w-12 h-12 bg-mimo-secondary text-mimo-primary rounded-full flex items-center justify-center mx-auto mb-3 text-xl">
+                <i class="fa-solid fa-heart"></i>
+            </div>
+            <h4 id="customAlertTitle" class="font-serif font-bold text-lg text-mimo-text mb-1">Aviso</h4>
+            <p id="customAlertMessage" class="text-sm text-mimo-muted mb-4">Mensaje de prueba</p>
+            <button onclick="closeCustomAlert()" class="w-full py-2 bg-mimo-primary text-white rounded-xl text-sm font-semibold hover:bg-mimo-primaryHover transition">
+                Entendido
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const appState = {
+            step: 0, // 0 = Recipient choice, 1-12 = Flow steps, 13 = Checkout, 14 = Final Gift View
+            recipient: 'pareja', // 'pareja' or 'mama'
+            senderName: '',
+            recipientName: '',
+            startDate: '',
+            unknownDate: false,
+            photos: [], // Base64 image strings
+            musicTrack: 'piano', // 'piano', 'acoustic', 'romantic'
+            letter: '',
+            reasons: [],
+            plans: [],
+            mapLocation: {
+                lat: -34.6037,
+                lng: -58.3816,
+                title: 'Nuestro Lugar Especial'
+            },
+            vouchers: [],
+            memories: [],
+            finalQuestion: '',
+            selectedTheme: 'atardecer',
+            isPaid: false,
+            // Live ticker handles
+            tickerInterval: null
+        };
+
+        // Default Presets according to recipient
+        const PRESETS = {
+            pareja: {
+                recipientLabel: '❤️ Para mi Novi@ / Pareja',
+                defaultSender: '',
+                defaultRecipient: '',
+                startDateDefault: '2026-02-14',
+                letterSuggestion: 'Gracias por ser mi lugar seguro y por hacerme sonreír cada día. Desde el primer instante supe que eras alguien verdaderamente especial en mi vida. Te amo infinitamente.',
+                letterChips: [
+                    "Gracias por hacerme la persona más feliz del mundo cada día ❤️",
+                    "Desde que llegaste a mi vida todo cobró un color más bonito ✨",
+                    "Contigo aprendí lo hermoso que es amar sin reservas 🌹",
+                    "No importa a dónde vayamos, mi lugar favorito siempre es a tu lado."
+                ],
+                reasonsSuggestions: [
+                    "Tu sonrisa sincera que ilumina cualquier día gris",
+                    "La forma dulcísima en que me miras a los ojos",
+                    "Tus abrazos reconfortantes cuando más los necesito",
+                    "Lo detallista y atento/a que eres siempre conmigo",
+                    "Tus risas contagiosas y bromas compartidas"
+                ],
+                plansSuggestions: [
+                    "Cita de picnic romántico viendo el atardecer",
+                    "Maratón de películas en un día lluvioso con chocolate caliente",
+                    "Un viaje juntos a una ciudad o playa que soñamos conocer",
+                    "Cocinar una cena italiana gourmet en pareja",
+                    "Ir a un concierto de nuestra banda favorita"
+                ],
+                vouchersList: [
+                    { id: 1, text: '🎟️ Vale por un beso súper apasionado de 10 segundos', icon: 'fa-kiss-wink-heart' },
+                    { id: 2, text: '🎟️ Vale por un masaje relajante de espalda (30 min)', icon: 'fa-hands' },
+                    { id: 3, text: '🎟️ Vale por una cena romántica preparada por mí', icon: 'fa-utensils' },
+                    { id: 4, text: '🎟️ Vale por no pelear ni discutir en todo el día', icon: 'fa-dove' },
+                    { id: 5, text: '🎟️ Vale por tu postre favorito traído a la cama', icon: 'fa-ice-cream' }
+                ],
+                memoriesList: [
+                    { date: 'El inicio', title: 'Nuestra primera cita', desc: 'Aquel café donde el tiempo se pasó volando y no queríamos despedirnos.' },
+                    { date: 'Un día inolvidable', title: 'Nuestro primer viaje juntos', desc: 'Risas, fotos y recuerdos grabados en el corazón para siempre.' }
+                ],
+                questionDefault: '¿Aceptas seguir construyendo esta hermosa historia de amor conmigo?'
+            },
+            mama: {
+                recipientLabel: '🌷 Para mi Mamá',
+                defaultSender: '',
+                defaultRecipient: '',
+                startDateDefault: '1998-05-10',
+                letterSuggestion: 'Mamá, no existen suficientes palabras para agradecerte por tu amor incondicional, tu paciencia infinita y por siempre dar todo por mí. Eres mi mayor ejemplo y la persona que más admiro.',
+                letterChips: [
+                    "Mamá, gracias por tu entrega incondicional y tu abrazo sanador 🌷",
+                    "Eres la mujer más valiente, noble y fuerte que conozco en este mundo.",
+                    "Gracias por cada consejo, cada comida hecha con amor y cada esfuerzo ❤️",
+                    "No hay refugio más cálido ni seguro en el mundo que tus brazos."
+                ],
+                reasonsSuggestions: [
+                    "Tu paciencia infinita y tu capacidad de escuchar siempre",
+                    "Tus deliciosas comidas caseras preparadas con puro amor",
+                    "Tu fortaleza ante cualquier obstáculo de la vida",
+                    "Tus abrazos reconfortantes que curan cualquier pena",
+                    "Tu amor incondicional sin juzgar jamás"
+                ],
+                plansSuggestions: [
+                    "Un día entero de Spa, masajes y relajación total para ti",
+                    "Una salida a cenar a tu restaurante preferido para consentirte",
+                    "Cocinarte tu plato favorito para que hoy no tengas que hacer nada",
+                    "Irmos de viaje juntas/os a ese lugar que sueñas visitar",
+                    "Tarde de té, fotos familiares antiguas y café juntas/os"
+                ],
+                vouchersList: [
+                    { id: 1, text: '🎟️ Vale por un día libre completo sin cocinar ni limpiar', icon: 'fa-spa' },
+                    { id: 2, text: '🎟️ Vale por un abrazo gigante de 5 minutos seguidos', icon: 'fa-heart' },
+                    { id: 3, text: '🎟️ Vale por prepararte tu plato favorito a la carta', icon: 'fa-concierge-bell' },
+                    { id: 4, text: '🎟️ Vale por un paseo juntos a tomar café y pastel', icon: 'fa-mug-hot' },
+                    { id: 5, text: '🎟️ Vale por ayudarte en todo lo que necesites hoy', icon: 'fa-hand-holding-heart' }
+                ],
+                memoriesList: [
+                    { date: 'Siempre en mi mente', title: 'Tus primeros consejos', desc: 'Esas palabras sabias que moldearon mi camino y quien soy hoy.' },
+                    { date: 'Momento especial', title: 'Aquel viaje o festejo familiar', desc: 'La felicidad pura de verte sonreír rodeada de los tuyos.' }
+                ],
+                questionDefault: '¿Sabías que eres la mamá más increíble y maravillosa de todo el universo?'
+            }
+        };
+
+        // Sample photos placeholders
+        const SAMPLE_PHOTOS = [
+            'https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&w=600&q=80',
+            'https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=600&q=80',
+            'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=600&q=80'
+        ];
+
+        window.addEventListener('DOMContentLoaded', () => {
+            // Set initial defaults
+            setRecipientDefaults('pareja');
+            createFloatingHearts();
+            renderStep();
+        });
+
+        function setRecipientDefaults(type) {
+            appState.recipient = type;
+            const preset = PRESETS[type];
+            appState.senderName = appState.senderName || preset.defaultSender;
+            appState.recipientName = preset.defaultRecipient;
+            appState.startDate = preset.startDateDefault;
+            appState.letter = preset.letterSuggestion;
+            appState.reasons = [...preset.reasonsSuggestions.slice(0, 3)];
+            appState.plans = [...preset.plansSuggestions.slice(0, 3)];
+            appState.vouchers = preset.vouchersList.map(v => v.text);
+            appState.memories = [...preset.memoriesList];
+            appState.finalQuestion = preset.questionDefault;
+            if (appState.photos.length === 0) {
+                appState.photos = [...SAMPLE_PHOTOS];
+            }
+        }
+
+        function createFloatingHearts() {
+            const container = document.getElementById('floatingHeartsContainer');
+            container.innerHTML = '';
+            const icons = ['fa-heart', 'fa-sparkles', 'fa-star', 'fa-heart-pulse'];
+            for (let i = 0; i < 12; i++) {
+                const el = document.createElement('i');
+                const randomIcon = icons[Math.floor(Math.random() * icons.length)];
+                el.className = `fa-solid ${randomIcon} floating-heart text-mimo-accent/20`;
+                el.style.left = `${Math.random() * 95}%`;
+                el.style.fontSize = `${Math.random() * 16 + 12}px`;
+                el.style.animationDelay = `${Math.random() * 6}s`;
+                el.style.animationDuration = `${Math.random() * 6 + 6}s`;
+                container.appendChild(el);
+            }
+        }
+
+        function goToStep(s) {
+            appState.step = s;
+            renderStep();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function nextStep() {
+            if (appState.step === 0) {
+                appState.step = 1;
+            } else if (appState.step < 13) {
+                appState.step++;
+            }
+            renderStep();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function prevStep() {
+            if (appState.step > 0 && appState.step <= 13) {
+                appState.step--;
+                renderStep();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function renderStep() {
+            const container = document.getElementById('appContainer');
+            const nav = document.getElementById('bottomNav');
+            const headerProgress = document.getElementById('headerProgressContainer');
+            const stepTitleInd = document.getElementById('stepTitleIndicator');
+            const badge = document.getElementById('recipientBadge');
+            const progressBar = document.getElementById('progressBar');
+            const btnNextText = document.getElementById('btnNextText');
+            const btnBack = document.getElementById('btnBack');
+
+            // Update header badge
+            badge.textContent = PRESETS[appState.recipient].recipientLabel;
+
+            // Handle special screens (Checkout or Published View)
+            if (appState.step === 0) {
+                headerProgress.classList.add('hidden');
+                nav.classList.add('hidden');
+            } else if (appState.step === 13 || appState.step === 14) {
+                headerProgress.classList.add('hidden');
+                nav.classList.add('hidden');
+            } else {
+                headerProgress.classList.remove('hidden');
+                nav.classList.remove('hidden');
+                stepTitleInd.textContent = `Paso ${appState.step} de 12`;
+                const pct = Math.round((appState.step / 12) * 100);
+                progressBar.style.width = `${pct}%`;
+                btnNextText.textContent = appState.step === 12 ? 'Ver Cobro y Publicar' : 'Continuar';
+                btnBack.style.visibility = appState.step === 1 ? 'visible' : 'visible';
+            }
+
+            // Render specific screen content
+            switch (appState.step) {
+                case 0: container.innerHTML = renderStep0Recipient(); break;
+                case 1: container.innerHTML = renderStep1Names(); break;
+                case 2: container.innerHTML = renderStep2Date(); initLiveTicker(); break;
+                case 3: container.innerHTML = renderStep3Photos(); break;
+                case 4: container.innerHTML = renderStep4Music(); break;
+                case 5: container.innerHTML = renderStep5Letter(); break;
+                case 6: container.innerHTML = renderStep6Reasons(); break;
+                case 7: container.innerHTML = renderStep7Plans(); break;
+                case 8: container.innerHTML = renderStep8Map(); setTimeout(initLeafletMap, 100); break;
+                case 9: container.innerHTML = renderStep9Vouchers(); break;
+                case 10: container.innerHTML = renderStep10Memories(); break;
+                case 11: container.innerHTML = renderStep11Question(); break;
+                case 12: container.innerHTML = renderStep12Theme(); break;
+                case 13: container.innerHTML = renderStep13Checkout(); break;
+                case 14: container.innerHTML = renderPublishedPage(); initLiveTickerPublished(); break;
+            }
+        }
+
+        function renderStep0Recipient() {
+            return `
+            <div class="fade-in max-w-lg mx-auto text-center py-6">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-mimo-secondary text-mimo-primary rounded-full mb-4 shadow-inner text-2xl">
+                    <i class="fa-solid fa-gift animate-heartbeat"></i>
+                </div>
+                <h1 class="text-3xl sm:text-4xl font-serif font-bold text-mimo-text mb-3">¿Para quién es esta página especial?</h1>
+                <p class="text-mimo-muted text-sm sm:text-base mb-8 max-w-md mx-auto">
+                    Selecciona a la persona protagonista. Adaptaremos toda la experiencia, textos, vales de regalo y sorpresas.
+                </p>
+
+                <div class="grid grid-cols-1 gap-4 text-left">
+                    <!-- Option 1: Pareja -->
+                    <div onclick="selectRecipientChoice('pareja')" class="group relative p-5 bg-white border-2 ${appState.recipient === 'pareja' ? 'border-mimo-primary ring-2 ring-mimo-primary/20' : 'border-mimo-border'} rounded-2xl shadow-sm hover:shadow-md cursor-pointer transition-all duration-200">
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 bg-rose-100 text-rose-500 rounded-2xl flex items-center justify-center text-xl shrink-0 group-hover:scale-105 transition">
+                                <i class="fa-solid fa-heart"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center justify-between">
+                                    <h3 class="font-serif font-bold text-lg text-mimo-text">Para mi Novi@ / Pareja</h3>
+                                    ${appState.recipient === 'pareja' ? '<i class="fa-solid fa-circle-check text-mimo-primary text-xl"></i>' : ''}
+                                </div>
+                                <p class="text-xs text-mimo-muted mt-1">Tono romántico, contador de tiempo de noviazgo, vales de citas y preguntas de amor.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Option 2: Mamá -->
+                    <div onclick="selectRecipientChoice('mama')" class="group relative p-5 bg-white border-2 ${appState.recipient === 'mama' ? 'border-mimo-primary ring-2 ring-mimo-primary/20' : 'border-mimo-border'} rounded-2xl shadow-sm hover:shadow-md cursor-pointer transition-all duration-200">
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center text-xl shrink-0 group-hover:scale-105 transition">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center justify-between">
+                                    <h3 class="font-serif font-bold text-lg text-mimo-text">Para mi Mamá</h3>
+                                    ${appState.recipient === 'mama' ? '<i class="fa-solid fa-circle-check text-mimo-primary text-xl"></i>' : ''}
+                                </div>
+                                <p class="text-xs text-mimo-muted mt-1">Tono de cariño y agradecimiento filial, recuerdos de familia y vales de mimos.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="nextStep()" class="w-full mt-8 py-4 bg-mimo-primary hover:bg-mimo-primaryHover text-white font-bold rounded-2xl shadow-lg shadow-mimo-primary/25 transition text-base flex items-center justify-center gap-2">
+                    <span>Comenzar a Crear Página</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+            `;
+        }
+
+        function selectRecipientChoice(choice) {
+            setRecipientDefaults(choice);
+            renderStep();
+        }
+
+        function renderStep1Names() {
+            return `
+            <div class="fade-in max-w-lg mx-auto space-y-6">
+                <div class="text-center">
+                    <span class="text-xs font-semibold text-mimo-primary bg-mimo-secondary px-3 py-1 rounded-full uppercase tracking-wider">Paso 1 de 12</span>
+                    <h2 class="text-2xl sm:text-3xl font-serif font-bold text-mimo-text mt-2">Los Protagonistas</h2>
+                    <p class="text-mimo-muted text-sm mt-1">Escribe los nombres tal como quieres que aparezcan en el encabezado.</p>
+                </div>
+
+                <!-- Live Card Header Preview -->
+                <div class="bg-gradient-to-r from-mimo-secondary to-orange-100/60 p-6 rounded-2xl border border-mimo-border text-center shadow-sm">
+                    <span class="text-xs text-mimo-muted uppercase font-medium tracking-widest block mb-1">Vista previa del encabezado</span>
+                    <h3 class="font-serif text-2xl sm:text-3xl font-bold text-mimo-text">
+                        <span id="previewSender">${appState.senderName || 'Tu Nombre'}</span>
+                        <span class="text-mimo-primary px-1"><i class="fa-solid fa-heart text-lg"></i></span>
+                        <span id="previewRecipient">${appState.recipientName || 'Su Nombre'}</span>
+                    </h3>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl border border-mimo-border shadow-sm space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-mimo-muted uppercase tracking-wider mb-1.5">Tu Nombre</label>
+                        <input type="text" value="${escapeHtml(appState.senderName)}" oninput="updateSenderName(this.value)" placeholder="" class="w-full px-4 py-3 rounded-xl border border-mimo-border focus:outline-none focus:ring-2 focus:ring-mimo-primary/50 text-mimo-text font-medium">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-mimo-muted uppercase tracking-wider mb-1.5">
+                            ${appState.recipient === 'pareja' ? 'Nombre de tu Pareja' : 'Nombre de tu Mamá'}
+                        </label>
+                        <input type="text" value="${escapeHtml(appState.recipientName)}" oninput="updateRecipientName(this.value)" placeholder="${appState.recipient === 'pareja' ? '' : ''}" class="w-full px-4 py-3 rounded-xl border border-mimo-border focus:outline-none focus:ring-2 focus:ring-mimo-primary/50 text-mimo-text font-medium">
+                    </div>
+                </div>
+            </div>
+            `;
+        }
+
+        function updateSenderName(val) {
+            appState.senderName = val;
+            const el = document.getElementById('previewSender');
+            if (el) el.textContent = val || 'Tu Nombre';
+        }
+
+        function updateRecipientName(val) {
+            appState.recipientName = val;
+            const el = document.getElementById('previewRecipient');
+            if (el) el.textContent = val || 'Su Nombre';
+        }
+
+        function renderStep2Date() {
+            return `
+            <div class="fade-in max-w-lg mx-auto space-y-6">
+                <div class="text-center">
+                    <span class="text-xs font-semibold text-mimo-primary bg-mimo-secondary px-3 py-1 rounded-full uppercase tracking-wider">Paso 2 de 12</span>
+                    <h2 class="text-2xl sm:text-3xl font-serif font-bold text-mimo-text mt-2">
+                        ${appState.recipient === 'pareja' ? '¿Desde cuándo están juntos?' : '¿Cuándo nació este amor?'}
+                    </h2>
+                    <p class="text-mimo-muted text-sm mt-1">Calcularemos el contador de tiempo exacto segundo a segundo.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl border border-mimo-border shadow-sm space-y-5">
+                    <div>
+                        <label class="block text-xs font-bold text-mimo-muted uppercase tracking-wider mb-1.5">Selecciona la Fecha Especial</label>
+                        <input type="date" value="${appState.startDate}" onchange="updateStartDate(this.value)" ${appState.unknownDate ? 'disabled' : ''} class="w-full px-4 py-3 rounded-xl border border-mimo-border focus:outline-none focus:ring-2 focus:ring-mimo-primary/50 text-mimo-text font-medium disabled:opacity-50">
+                    </div>
+
+                    <div class="flex items-center gap-2 pt-1">
+                        <input type="checkbox" id="chkUnknown" ${appState.unknownDate ? 'checked' : ''} onchange="toggleUnknownDate(this.checked)" class="w-4 h-4 text-mimo-primary border-mimo-border rounded focus:ring-mimo-primary">
+                        <label for="chkUnknown" class="text-xs font-medium text-mimo-muted cursor-pointer">Todavía nos estamos conociendo / No recuerdo la fecha exacta</label>
+                    </div>
+
+                    <!-- Live Ticking Clock Preview -->
+                    <div id="tickerBox" class="${appState.unknownDate ? 'hidden' : 'block'} bg-mimo-bg p-4 rounded-xl border border-mimo-border text-center">
+                        <span class="text-xs font-bold text-mimo-primary uppercase tracking-widest block mb-2">⏱️ Contador en Tiempo Real</span>
+                        <div class="grid grid-cols-3 sm:grid-cols-6 gap-2 text-center" id="liveTickerGrid">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            `;
+        }
+
+        function updateStartDate(val) {
+            appState.startDate = val;
+            updateTickerUI();
+        }
+
+        function toggleUnknownDate(checked) {
+            appState.unknownDate = checked;
+            const box = document.getElementById('tickerBox');
+            if (box) box.classList.toggle('hidden', checked);
+        }
+
+        function initLiveTicker() {
+            if (appState.tickerInterval) clearInterval(appState.tickerInterval);
+            updateTickerUI();
+            appState.tickerInterval = setInterval(updateTickerUI, 1000);
+        }
+
+        function updateTickerUI() {
+            const grid = document.getElementById('liveTickerGrid');
+            if (!grid || !appState.startDate || appState.unknownDate) return;
+
+            const diff = calculateTimeDiff(new Date(appState.startDate));
+            grid.innerHTML = `
+                <div class="bg-white p-2 rounded-lg border border-mimo-border"><span class="text-lg font-bold text-mimo-text block">${diff.years}</span><span class="text-[10px] text-mimo-muted uppercase">Años</span></div>
+                <div class="bg-white p-2 rounded-lg border border-mimo-border"><span class="text-lg font-bold text-mimo-text block">${diff.months}</span><span class="text-[10px] text-mimo-muted uppercase">Meses</span></div>
+                <div class="bg-white p-2 rounded-lg border border-mimo-border"><span class="text-lg font-bold text-mimo-text block">${diff.days}</span><span class="text-[10px] text-mimo-muted uppercase">Días</span></div>
+                <div class="bg-white p-2 rounded-lg border border-mimo-border"><span class="text-lg font-bold text-mimo-text block">${diff.hours}</span><span class="text-[10px] text-mimo-muted uppercase">Horas</span></div>
+                <div class="bg-white p-2 rounded-lg border border-mimo-border"><span class="text-lg font-bold text-mimo-text block">${diff.minutes}</span><span class="text-[10px] text-mimo-muted uppercase">Min</span></div>
+                <div class="bg-white p-2 rounded-lg border border-mimo-border"><span class="text-lg font-bold text-mimo-primary block">${diff.seconds}</span><span class="text-[10px] text-mimo-muted uppercase">Seg</span></div>
+            `;
+        }
+
+        function calculateTimeDiff(start) {
+            const now = new Date();
+            let delta = Math.abs(now - start) / 1000;
+
+            const years = Math.floor(delta / 31536000);
+            delta -= years * 31536000;
+
+            const months = Math.floor(delta / 2592000);
+            delta -= months * 2592000;
+
+            const days = Math.floor(delta / 86400);
+            delta -= days * 86400;
+
+            const hours = Math.floor(delta / 3600) % 24;
+            delta -= hours * 3600;
+
+            const minutes = Math.floor(delta / 60) % 60;
+            const seconds = Math.floor(delta % 60);
+
+            return { years, months, days, hours, minutes, seconds };
+        }
+
+        function renderStep3Photos() {
+            let photoCards = '';
+            for (let i = 0; i < 6; i++) {
+                const img = appState.photos[i];
+                if (img) {
+                    photoCards += `
+                    <div class="relative group aspect-square rounded-2xl overflow-hidden border-2 border-mimo-primary/40 shadow-sm">
+                        <img src="${img}" class="w-full h-full object-cover">
+                        <button onclick="removePhoto(${i})" class="absolute top-2 right-2 bg-rose-500 text-white w-7 h-7 rounded-full flex items-center justify-center text-xs shadow-md opacity-90 hover:scale-110 transition">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                        <span class="absolute bottom-2 left-2 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded-full backdrop-blur-xs">Foto ${i+1}</span>
+                    </div>
+                    `;
+                } else {
+                    photoCards += `
+                    <label class="flex flex-col items-center justify-center aspect-square rounded-2xl border-2 border-dashed border-mimo-border hover:border-mimo-primary bg-white hover:bg-mimo-secondary/30 cursor-pointer transition p-3 text-center">
+                        <i class="fa-solid fa-camera-retro text-2xl text-mimo-muted/60 mb-1"></i>
+                        <span class="text-xs font-semibold text-mimo-muted">Subir Foto</span>
+                        <input type="file" accept="image/*" onchange="handlePhotoUpload(event, ${i})" class="hidden">
+                    </label>
+                    `;
+                }
+            }
+
+            return `
+            <div class="fade-in max-w-lg mx-auto space-y-6">
+                <div class="text-center">
+                    <span class="text-xs font-semibold text-mimo-primary bg-mimo-secondary px-3 py-1 rounded-full uppercase tracking-wider">Paso 3 de 12</span>
+                    <h2 class="text-2xl sm:text-3xl font-serif font-bold text-mimo-text mt-2">Galería de Fotos</h2>
+                    <p class="text-mimo-muted text-sm mt-1">Añade hasta 6 fotos de momentos felices compartidos.</p>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    ${photoCards}
+                </div>
+                <p class="text-xs text-center text-mimo-muted italic">* Puedes cambiar las imágenes predeterminadas haciendo clic en la papelera y subiendo las tuyas.</p>
+            </div>
+            `;
+        }
+
+        function handlePhotoUpload(e, index) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                appState.photos[index] = evt.target.result;
+                renderStep();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removePhoto(index) {
+            appState.photos.splice(index, 1);
+            renderStep();
+        }
+
+        function renderStep4Music() {
+            return `
+            <div class="fade-in max-w-lg mx-auto space-y-6">
+                <div class="text-center">
+                    <span class="text-xs font-semibold text-mimo-primary bg-mimo-secondary px-3 py-1 rounded-full uppercase tracking-wider">Paso 4 de 12</span>
+                    <h2 class="text-2xl sm:text-3xl font-serif font-bold text-mimo-text mt-2">Música de Fondo</h2>
+                    <p class="text-mimo-muted text-sm mt-1">Elige la melodía especial que sonará al abrir tu carta.</p>
+                </div>
+
+                <div class="space-y-3">
+                    <div onclick="selectMusicTrack('piano')" class="p-4 rounded-2xl border-2 ${appState.musicTrack === 'piano' ? 'border-mimo-primary bg-mimo-secondary/30' : 'border-mimo-border bg-white'} cursor-pointer flex items-center justify-between transition">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-orange-100 text-mimo-primary flex items-center justify-center text-lg">
+                                <i class="fa-solid fa-music"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm text-mimo-text">Piano Romántico & Suave</h4>
+                                <p class="text-xs text-mimo-muted">Melodía instrumental emotiva</p>
+                            </div>
+                        </div>
+                        ${appState.musicTrack === 'piano' ? '<i class="fa-solid fa-circle-check text-mimo-primary text-xl"></i>' : ''}
+                    </div>
+
+                    <div onclick="selectMusicTrack('acoustic')" class="p-4 rounded-2xl border-2 ${appState.musicTrack === 'acoustic' ? 'border-mimo-primary bg-mimo-secondary/30' : 'border-mimo-border bg-white'} cursor-pointer flex items-center justify-between transition">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-lg">
+                                <i class="fa-solid fa-guitar"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm text-mimo-text">Guitarra Acústica Cálida</h4>
+                                <p class="text-xs text-mimo-muted">Acordes dulces y pacíficos</p>
+                            </div>
+                        </div>
+                        ${appState.musicTrack === 'acoustic' ? '<i class="fa-solid fa-circle-check text-mimo-primary text-xl"></i>' : ''}
+                    </div>
+
+                    <div onclick="selectMusicTrack('romantic')" class="p-4 rounded-2xl border-2 ${appState.musicTrack === 'romantic' ? 'border-mimo-primary bg-mimo-secondary/30' : 'border-mimo-border bg-white'} cursor-pointer flex items-center justify-between transition">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-500 flex items-center justify-center text-lg">
+                                <i class="fa-solid fa-compact-disc"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm text-mimo-text">Caja de Música de Ensueño</h4>
+                                <p class="text-xs text-mimo-muted">Ambiente poético y nostálgico</p>
+                            </div>
+                        </div>
+                        ${appState.musicTrack === 'romantic' ? '<i class="fa-solid fa-circle-check text-mimo-primary text-xl"></i>' : ''}
+                    </div>
+                </div>
+
+                <!-- Mock Audio Player Preview -->
+                <div class="bg-white p-4 rounded-2xl border border-mimo-border shadow-sm flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <button onclick="toggleMockAudio(this)" class="w-10 h-10 rounded-full bg-mimo-primary text-white flex items-center justify-center shadow-md">
+                            <i class="fa-solid fa-play"></i>
+                        </button>
+                        <div>
+                            <span class="text-xs text-mimo-muted uppercase block">Probar Sonido</span>
+                            <span class="text-xs font-bold text-mimo-text">Pista activa: ${appState.musicTrack.toUpperCase()}</span>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-volume-high text-mimo-muted text-sm"></i>
+                </div>
+            </div>
+            `;
+        }
+
+        function selectMusicTrack(track) {
+            appState.musicTrack = track;
+            renderStep();
+        }
+
+        function toggleMockAudio(btn) {
+            const icon = btn.querySelector('i');
+            if (icon.classList.contains('fa-play')) {
+                icon.className = 'fa-solid fa-pause';
+                playSyntheticTone();
+            } else {
+                icon.className = 'fa-solid fa-play';
+            }
+        }
+
+        function playSyntheticTone() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(440, ctx.currentTime); // Note A4
+                gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 1.5);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 1.5);
+            } catch(e) {}
+        }
+
+        function renderStep5Letter() {
+            const preset = PRESETS[appState.recipient];
+            const chips = preset.letterChips.map(c => `
+                <button onclick="insertLetterChip('${escapeHtml(c)}')" class="text-xs bg-mimo-secondary text-mimo-text hover:bg-mimo-primary hover:text-white px-3 py-1.5 rounded-full transition text-left">
+                    + ${c}
+                </button>
+            `).join('');
+
+            return `
+            <div class="fade-in max-w-lg mx-auto space-y-5">
+                <div class="text-center">
+                    <span class="text-xs font-semibold text-mimo-primary bg-mimo-secondary px-3 py-1 rounded-full uppercase tracking-wider">Paso 5 de 12</span>
+                    <h2 class="text-2xl sm:text-3xl font-serif font-bold text-mimo-text mt-2">Tu Carta de Amor</h2>
+                    <p class="text-mimo-muted text-sm mt-1">Expresa todo lo que sientes con tus palabras.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border border-mimo-border shadow-sm space-y-3">
+                    <div>
+                        <div class="flex justify-between text-xs text-mimo-muted font-bold uppercase mb-1">
+                            <span>Mensaje Personal</span>
+                            <span id="charCounter">${appState.letter.length} / 2000</span>
+                        </div>
+                        <textarea id="letterTextarea" oninput="updateLetterText(this.value)" rows="6" maxlength="2000" placeholder="Escribe aquí tu carta desde el corazón..." class="w-full p-4 rounded-xl border border-mimo-border focus:outline-none focus:ring-2 focus:ring-mimo-primary/50 text-mimo-text text-sm font-serif leading-relaxed">${escapeHtml(appState.letter)}</textarea>
+                    </div>
+
+                    <div>
+                        <span class="text-xs font-bold text-mimo-muted uppercase block mb-2">💡 Sugerencias Rápidas (${appState.recipient === 'pareja' ? 'Novi@' : 'Mamá'}):</span>
+                        <div class="flex flex-wrap gap-2">
+                            ${chips}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            `;
+        }
+
+        function updateLetterText(val) {
+            appState.letter = val;
+            const cnt = document.getElementById('charCounter');
+            if (cnt) cnt.textContent = `${val.length} / 2000`;
+        }
+
+        function insertLetterChip(text) {
+            appState.letter += (appState.letter.length > 0 ? '\n\n' : '') + text;
+            renderStep();
+        }
+
+        function renderStep6Reasons() {
+            const listItems = appState.reasons.map((r, i) => `
+                <div class="flex items-center gap-2 bg-mimo-bg p-3 rounded-xl border border-mimo-border">
+                    <i class="fa-solid fa-heart text-mimo-primary text-xs"></i>
+                    <input type="text" value="${escapeHtml(r)}" onchange="updateReasonItem(${i}, this.value)" class="flex-1 bg-transparent border-none text-xs font-semibold text-mimo-text focus:outline-none">
+                    <button onclick="removeReason(${i})" class="text-mimo-muted hover:text-rose-500 px-1">
+                        <i class="fa-solid fa-trash-can text-xs"></i>
+                    </button>
+                </div>
+            `).join('');
+
+            const suggestions = PRESETS[appState.recipient].reasonsSuggestions.map(s => `
+                <button onclick="addReasonItem('${escapeHtml(s)}')" class="text-xs bg-white border border-mimo-border hover:border-mimo-primary text-mimo-text px-3 py-1.5 rounded-xl shadow-xs transition">
+                    + ${s}
+                </button>
+            `).join('');
+
+            return `
+            <div class="fade-in max-w-lg mx-auto space-y-5">
+                <div class="text-center">
+                    <span class="text-xs font-semibold text-mimo-primary bg-mimo-secondary px-3 py-1 rounded-full uppercase tracking-wider">Paso 6 de 12</span>
+                    <h2 class="text-2xl sm:text-3xl font-serif font-bold text-mimo-text mt-2">
+                        ${appState.recipient === 'pareja' ? 'Lo que más amo de ti' : 'Lo que más le agradezco a Mamá'}
+                    </h2>
+                    <p class="text-mimo-muted text-sm mt-1">Cualidades e virtudes que hacen única a esta persona.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border border-mimo-border shadow-sm space-y-4">
+                    <div class="space-y-2">
+                        ${listItems}
+                    </div>
+
+                    <div class="flex gap-2">
+                        <input type="text" id="newReasonInput" placeholder="Añadir otra cualidad..." class="flex-1 px-4 py-2.5 rounded-xl border border-mimo-border text-xs focus:outline-none focus:ring-2 focus:ring-mimo-primary/50">
+                        <button onclick="addReasonFromInput()" class="px-4 py-2.5 bg-mimo-primary text-white rounded-xl text-xs font-bold hover:bg-mimo-primaryHover">Añadir</button>
+                    </div>
+
+                    <div class="pt-2 border-t border-mimo-border">
+                        <span class="text-xs font-bold text-mimo-muted uppercase block mb-2">💡 Sugerencias Populares:</span>
+                        <div class="flex flex-wrap gap-1.5">
+                            ${suggestions}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            `;
+        }
+
+        function updateReasonItem(index, val) {
+            appState.reasons[index] = val;
+        }
+
+        function removeReason(index) {
+            appState.reasons.splice(index, 1);
+            renderStep();
+        }
+
+        function addReasonItem(text) {
+            appState.reasons.push(text);
+            renderStep();
+        }
+
+        function addReasonFromInput() {
+            const input = document.getElementById('newReasonInput');
+            if (input && input.value.trim() !== '') {
+                addReasonItem(input.value.trim());
+            }
+        }
+
+        function renderStep7Plans() {
+            const listItems = appState.plans.map((p, i) => `
+                <div class="flex items-center gap-2 bg-mimo-bg p-3 rounded-xl border border-mimo-border">
+                    <i class="fa-solid fa-compass text-mimo-primary text-xs"></i>
+                    <input type="text" value="${escapeHtml(p)}" onchange="updatePlanItem(${i}, this.value)" class="flex-1 bg-transparent border-none text-xs font-semibold text-mimo-text focus:outline-none">
+                    <button onclick="removePlan(${i})" class="text-mimo-muted hover:text-rose-500 px-1">
+                        <i class="fa-solid fa-trash-can text-xs"></i>
+                    </button>
+                </div>
+            `).join('');
+
+            const suggestions = PRESETS[appState.recipient].plansSuggestions.map(s => `
+                <button onclick="addPlanItem('${escapeHtml(s)}')" class="text-xs bg-white border border-mimo-border hover:border-mimo-primary text-mimo-text px-3 py-1.5 rounded-xl shadow-xs transition">
+                    + ${s}
+                </button>
+            `).join('');
+
+            return `
+            <div class="fade-in max-w-lg mx-auto space-y-5">
+                <div class="text-center">
+                    <span class="text-xs font-semibold text-mimo-primary bg-mimo-secondary px-3 py-1 rounded-full uppercase tracking-wider">Paso 7 de 12</span>
+                    <h2 class="text-2xl sm:text-3xl font-serif font-bold text-mimo-text mt-2">Planes Futuros</h2>
+                    <p class="text-mimo-muted text-sm mt-1">Cosas que quieres hacer juntos en los próximos meses.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border border-mimo-border shadow-sm space-y-4">
+                    <div class="space-y-2">
+                        ${listItems}
+                    </div>
+
+                    <div class="flex gap-2">
+                        <input type="text" id="newPlanInput" placeholder="Añadir nuevo plan o sueño..." class="flex-1 px-4 py-2.5 rounded-xl border border-mimo-border text-xs focus:outline-none focus:ring-2 focus:ring-mimo-primary/50">
+                        <button onclick="addPlanFromInput()" class="px-4 py-2.5 bg-mimo-primary text-white rounded-xl text-xs font-bold hover:bg-mimo-primaryHover">Añadir</button>
+                    </div>
+
+                    <div class="pt-2 border-t border-mimo-border">
+                        <span class="text-xs font-bold text-mimo-muted uppercase block mb-2">💡 Sugerencias de Experiencias:</span>
+                        <div class="flex flex-wrap gap-1.5">
+                            ${suggestions}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            `;
+        }
+
+        function updatePlanItem(index, val) {
+            appState.plans[index] = val;
+        }
+
+        function removePlan(index) {
+            appState.plans.splice(index, 1);
+            renderStep();
+        }
+
+        function addPlanItem(text) {
+            appState.plans.push(text);
+            renderStep();
+        }
+
+        function addPlanFromInput() {
+            const input = document.getElementById('newPlanInput');
+            if (input && input.value.trim() !== '') {
+                addPlanItem(input.value.trim());
+            }
+        }
+
+        function renderStep8Map() {
+            return `
+            <div class="fade-in max-w-lg mx-auto space-y-5">
+                <div class="text-center">
+                    <span class="text-xs font-semibold text-mimo-primary bg-mimo-secondary px-3 py-1 rounded-full uppercase tracking-wider">Paso 8 de 12</span>
+                    <h2 class="text-2xl sm:text-3xl font-serif font-bold text-mimo-text mt-2">Dónde empezó todo</h2>
+                    <p class="text-mimo-muted text-sm mt-1">Haz clic en el mapa para fijar el pin del lugar especial.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border border-mimo-border shadow-sm space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-mimo-muted uppercase tracking-wider mb-1.5">Nombre del Lugar Especial</label>
+                        <input type="text" value="${escapeHtml(appState.mapLocation.title)}" oninput="appState.mapLocation.title = this.value" placeholder="Ej. El café de nuestra primera cita" class="w-full px-4 py-2.5 rounded-xl border border-mimo-border text-xs focus:outline-none focus:ring-2 focus:ring-mimo-primary/50">
+                    </div>
+
+                    <!-- Map Render Canvas -->
+                    <div id="leafletMapContainer" class="w-full h-64 rounded-xl border border-mimo-border overflow-hidden z-10 shadow-inner"></div>
+
+                    <p class="text-xs text-mimo-muted text-center italic">
+                        📍 Ubicación fijada: Lat ${appState.mapLocation.lat.toFixed(4)}, Lng ${appState.mapLocation.lng.toFixed(4)}
+                    </p>
+                </div>
+            </div>
+            `;
+        }
+
+        let mapInstance = null;
+        let markerInstance = null;
+
+        function initLeafletMap() {
+            const mapContainer = document.getElementById('leafletMapContainer');
+            if (!mapContainer) return;
+
+            mapInstance = L.map('leafletMapContainer').setView([appState.mapLocation.lat, appState.mapLocation.lng], 12);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap'
+            }).addTo(mapInstance);
+
+            markerInstance = L.marker([appState.mapLocation.lat, appState.mapLocation.lng], { draggable: true }).addTo(mapInstance);
+            markerInstance.bindPopup(appState.mapLocation.title).openPopup();
+
+            mapInstance.on('click', function(e) {
+                appState.mapLocation.lat = e.latlng.lat;
+                appState.mapLocation.lng = e.latlng.lng;
+                markerInstance.setLatLng(e.latlng);
+                markerInstance.bindPopup(appState.mapLocation.title || 'Lugar Especial').openPopup();
+            });
+
+            markerInstance.on('dragend', function(e) {
+                const pos = markerInstance.getLatLng();
+                appState.mapLocation.lat = pos.lat;
+                appState.mapLocation.lng = pos.lng;
+            });
+        }
+
+        function renderStep9Vouchers() {
+            const preset = PRESETS[appState.recipient];
+            const voucherCards = preset.vouchersList.map(v => {
+                const isSelected = appState.vouchers.includes(v.text);
+                return `
+                <div onclick="toggleVoucherSelection('${escapeHtml(v.text)}')" class="p-4 rounded-2xl border-2 ${isSelected ? 'border-mimo-primary bg-mimo-secondary/40' : 'border-mimo-border bg-white'} cursor-pointer transition flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-orange-100 text-mimo-primary flex items-center justify-center text-lg shrink-0">
+                        <i class="fa-solid ${v.icon}"></i>
+                    </div>
+                    <div class="flex-1">
+                        <span class="text-xs font-bold text-mimo-text block">${v.text}</span>
+                    </div>
+                    <div>
+                        ${isSelected ? '<i class="fa-solid fa-circle-check text-mimo-primary text-xl"></i>' : '<div class="w-5 h-5 rounded-full border border-mimo-border"></div>'}
+                    </div>
+                </div>
+                `;
+            }).join('');
+
+            return `
+            <div class="fade-in max-w-lg mx-auto space-y-5">
+                <div class="text-center">
+                    <span class="text-xs font-semibold text-mimo-primary bg-mimo-secondary px-3 py-1 rounded-full uppercase tracking-wider">Paso 9 de 12</span>
+                    <h2 class="text-2xl sm:text-3xl font-serif font-bold text-mimo-text mt-2">Vales de Regalo Canjeables</h2>
+                    <p class="text-mimo-muted text-sm mt-1">Cupones interactivos que podrá canjear directamente en la página web.</p>
+                </div>
+
+                <div class="space-y-3">
+                    ${voucherCards}
+                </div>
+
+                <div class="bg-white p-4 rounded-2xl border border-mimo-border shadow-sm flex gap-2">
+                    <input type="text" id="customVoucherInput" placeholder="Crear un vale personalizado..." class="flex-1 px-4 py-2 rounded-xl border border-mimo-border text-xs focus:outline-none focus:ring-2 focus:ring-mimo-primary/50">
+                    <button onclick="addCustomVoucher()" class="px-4 py-2 bg-mimo-primary text-white text-xs font-bold rounded-xl hover:bg-mimo-primaryHover">Añadir</button>
+                </div>
+            </div>
+            `;
+        }
+
+        function toggleVoucherSelection(text) {
+            const idx = appState.vouchers.indexOf(text);
+            if (idx > -1) {
+                appState.vouchers.splice(idx, 1);
+            } else {
+                appState.vouchers.push(text);
+            }
+            renderStep();
+        }
+
+        function addCustomVoucher() {
+            const input = document.getElementById('customVoucherInput');
+            if (input && input.value.trim() !== '') {
+                appState.vouchers.push('🎟️ ' + input.value.trim());
+                input.value = '';
+                renderStep();
+            }
+        }
+
+        function renderStep10Memories() {
+            const items = appState.memories.map((m, i) => `
+                <div class="relative pl-6 border-l-2 border-mimo-primary/40 pb-4 space-y-1">
+                    <div class="absolute -left-[7px] top-0 w-3 h-3 rounded-full bg-mimo-primary"></div>
+                    <div class="flex items-center justify-between">
+                        <input type="text" value="${escapeHtml(m.date)}" onchange="appState.memories[${i}].date = this.value" class="text-xs font-bold text-mimo-primary bg-transparent focus:outline-none w-1/3">
+                        <button onclick="appState.memories.splice(${i}, 1); renderStep();" class="text-mimo-muted hover:text-rose-500 text-xs">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                    <input type="text" value="${escapeHtml(m.title)}" onchange="appState.memories[${i}].title = this.value" placeholder="Título del momento" class="w-full text-sm font-serif font-bold text-mimo-text bg-transparent focus:outline-none">
+                    <textarea onchange="appState.memories[${i}].desc = this.value" placeholder="Descripción breve..." class="w-full text-xs text-mimo-muted bg-transparent focus:outline-none resize-none">${escapeHtml(m.desc)}</textarea>
+                </div>
+            `).join('');
+
+            return `
+            <div class="fade-in max-w-lg mx-auto space-y-5">
+                <div class="text-center">
+                    <span class="text-xs font-semibold text-mimo-primary bg-mimo-secondary px-3 py-1 rounded-full uppercase tracking-wider">Paso 10 de 12</span>
+                    <h2 class="text-2xl sm:text-3xl font-serif font-bold text-mimo-text mt-2">Recuerdos Inolvidables</h2>
+                    <p class="text-mimo-muted text-sm mt-1">Línea de tiempo con los hitos más bonitos de su historia.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border border-mimo-border shadow-sm space-y-4">
+                    <div class="space-y-2">
+                        ${items}
+                    </div>
+
+                    <button onclick="addNewMemoryItem()" class="w-full py-2.5 border-2 border-dashed border-mimo-primary/40 text-mimo-primary font-bold text-xs rounded-xl hover:bg-mimo-secondary/30 transition">
+                        + Añadir Nuevo Hito Histórico
+                    </button>
+                </div>
+            </div>
+            `;
+        }
+
+        function addNewMemoryItem() {
+            appState.memories.push({
+                date: 'Nueva Fecha',
+                title: 'Nuevo Recuerdo Especial',
+                desc: 'Describe lo bonito que la pasaron en este momento...'
+            });
+            renderStep();
+        }
+
+        function renderStep11Question() {
+            return `
+            <div class="fade-in max-w-lg mx-auto space-y-5">
+                <div class="text-center">
+                    <span class="text-xs font-semibold text-mimo-primary bg-mimo-secondary px-3 py-1 rounded-full uppercase tracking-wider">Paso 11 de 12</span>
+                    <h2 class="text-2xl sm:text-3xl font-serif font-bold text-mimo-text mt-2">La Pregunta Final</h2>
+                    <p class="text-mimo-muted text-sm mt-1">El momento culminante interactivo al final de la carta.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border border-mimo-border shadow-sm space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-mimo-muted uppercase tracking-wider mb-1.5">Personaliza la Pregunta</label>
+                        <input type="text" value="${escapeHtml(appState.finalQuestion)}" oninput="appState.finalQuestion = this.value" class="w-full px-4 py-3 rounded-xl border border-mimo-border text-sm font-serif font-bold text-mimo-text focus:outline-none focus:ring-2 focus:ring-mimo-primary/50">
+                    </div>
+
+                    <!-- Interactive Playful Simulation Widget -->
+                    <div class="bg-mimo-bg p-6 rounded-2xl border border-mimo-border text-center space-y-4 relative overflow-hidden min-h-[160px] flex flex-col justify-center items-center">
+                        <span class="text-[10px] font-bold text-mimo-muted uppercase tracking-widest block">Prueba de Interactividad</span>
+                        <h4 class="font-serif font-bold text-lg text-mimo-text" id="demoQuestionText">${escapeHtml(appState.finalQuestion)}</h4>
+
+                        <div class="flex items-center gap-4 justify-center relative w-full h-12" id="demoButtonsArea">
+                            <button onclick="triggerDemoYesConfetti()" class="px-6 py-2 bg-mimo-primary text-white font-bold rounded-xl shadow-md hover:scale-105 transition">
+                                ¡Sí! ❤️
+                            </button>
+                            <button id="demoBtnNo" onmouseover="runawayDemoNoButton()" onclick="runawayDemoNoButton()" class="px-6 py-2 bg-gray-200 text-mimo-muted font-bold rounded-xl transition transition-all duration-200">
+                                No
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            `;
+        }
+
+        function triggerDemoYesConfetti() {
+            confetti({
+                particleCount: 80,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+            showCustomAlert("¡Respuesta SÍ!", "Así es como reaccionará la página con una lluvia de corazones y confeti.");
+        }
+
+        function runawayDemoNoButton() {
+            const btn = document.getElementById('demoBtnNo');
+            if (!btn) return;
+            const x = (Math.random() - 0.5) * 160;
+            const y = (Math.random() - 0.5) * 60;
+            btn.style.transform = `translate(${x}px, ${y}px)`;
+        }
+
+        function renderStep12Theme() {
+            const themes = [
+                { id: 'atardecer', title: 'Atardecer Cálido', desc: 'Tonos terracota, crema y rosas románticos', bg: 'from-orange-100 to-rose-100', border: 'border-mimo-primary' },
+                { id: 'noche', title: 'Noche Estrellada', desc: 'Azul profundo, violeta e iluminación nocturna', bg: 'from-slate-900 to-indigo-950 text-white', border: 'border-indigo-500' },
+                { id: 'rosa', title: 'Rosa Minimalista', desc: 'Granate, cuarzo rosa y blanco puro', bg: 'from-pink-100 to-rose-200', border: 'border-rose-400' },
+                { id: 'jardin', title: 'Jardín Botánico', desc: 'Verde salvia, oliva suave y frescura natural', bg: 'from-emerald-100 to-teal-100', border: 'border-emerald-500' }
+            ];
+
+            const cards = themes.map(t => {
+                const isSelected = appState.selectedTheme === t.id;
+                return `
+                <div onclick="selectThemeChoice('${t.id}')" class="p-5 rounded-2xl border-2 ${isSelected ? 'border-mimo-primary ring-2 ring-mimo-primary/20' : 'border-mimo-border'} bg-white cursor-pointer transition shadow-xs hover:shadow-md">
+                    <div class="h-16 rounded-xl bg-gradient-to-r ${t.bg} p-3 flex items-end justify-between mb-3 border border-black/5">
+                        <span class="text-xs font-serif font-bold ${t.id === 'noche' ? 'text-white' : 'text-mimo-text'}">Vista Tema</span>
+                        <i class="fa-solid fa-palette ${t.id === 'noche' ? 'text-amber-300' : 'text-mimo-primary'}"></i>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h4 class="font-serif font-bold text-base text-mimo-text">${t.title}</h4>
+                            <p class="text-xs text-mimo-muted">${t.desc}</p>
+                        </div>
+                        ${isSelected ? '<i class="fa-solid fa-circle-check text-mimo-primary text-xl"></i>' : ''}
+                    </div>
+                </div>
+                `;
+            }).join('');
+
+            return `
+            <div class="fade-in max-w-lg mx-auto space-y-5">
+                <div class="text-center">
+                    <span class="text-xs font-semibold text-mimo-primary bg-mimo-secondary px-3 py-1 rounded-full uppercase tracking-wider">Paso 12 de 12</span>
+                    <h2 class="text-2xl sm:text-3xl font-serif font-bold text-mimo-text mt-2">Elige el Tema Visual</h2>
+                    <p class="text-mimo-muted text-sm mt-1">Selecciona los colores y estilo estético para la página pública.</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    ${cards}
+                </div>
+            </div>
+            `;
+        }
+
+        function selectThemeChoice(themeId) {
+            appState.selectedTheme = themeId;
+            renderStep();
+        }
+
+        function renderStep13Checkout() {
+            return `
+            <div class="fade-in max-w-lg mx-auto space-y-6 py-4">
+                <div class="text-center">
+                    <div class="inline-flex items-center justify-center w-14 h-14 bg-emerald-100 text-emerald-600 rounded-full mb-3 text-2xl">
+                        <i class="fa-solid fa-check-double"></i>
+                    </div>
+                    <h2 class="text-3xl font-serif font-bold text-mimo-text">¡Tu página está lista!</h2>
+                    <p class="text-mimo-muted text-sm mt-1">Estás a un solo paso de publicar y obtener el enlace personalizado.</p>
+                </div>
+
+                <!-- Order Summary Box -->
+                <div class="bg-white p-6 rounded-2xl border border-mimo-border shadow-sm space-y-4">
+                    <div class="flex items-center justify-between pb-3 border-b border-mimo-border">
+                        <div>
+                            <h3 class="font-serif font-bold text-lg text-mimo-text">Página Web "${appState.senderName} & ${appState.recipientName}"</h3>
+                            <p class="text-xs text-mimo-muted">Alojamiento garantizado 100% permanente + Dominio único</p>
+                        </div>
+                        <span class="text-2xl font-serif font-bold text-mimo-primary">$4,990 <span class="text-xs text-mimo-muted font-normal block text-right">ARS</span></span>
+                    </div>
+
+                    <ul class="text-xs space-y-2 text-mimo-muted">
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-500"></i> Contador en vivo de tiempo transcurrido</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-500"></i> Galería de 6 fotos con reproductor musical</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-500"></i> Mapa interactivo + Vales de regalo canjeables</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-500"></i> La pregunta final juguetona con lluvia de confeti</li>
+                    </ul>
+                </div>
+
+                <!-- Payment Methods Selector -->
+                <div class="bg-white p-6 rounded-2xl border border-mimo-border shadow-sm space-y-3">
+                    <span class="text-xs font-bold text-mimo-muted uppercase tracking-wider block mb-2">Selecciona Método de Pago</span>
+
+                    <label class="flex items-center justify-between p-3 rounded-xl border border-mimo-primary bg-mimo-secondary/30 cursor-pointer">
+                        <div class="flex items-center gap-3">
+                            <input type="radio" name="payMethod" checked class="text-mimo-primary focus:ring-mimo-primary">
+                            <span class="font-bold text-xs text-mimo-text">Mercado Pago / Tarjetas Argentina</span>
+                        </div>
+                        <i class="fa-solid fa-bolt text-sky-500 text-base"></i>
+                    </label>
+
+                    <label class="flex items-center justify-between p-3 rounded-xl border border-mimo-border hover:border-mimo-primary cursor-pointer">
+                        <div class="flex items-center gap-3">
+                            <input type="radio" name="payMethod" class="text-mimo-primary focus:ring-mimo-primary">
+                            <span class="font-bold text-xs text-mimo-text">Tarjeta de Crédito / Débito Internacional</span>
+                        </div>
+                        <i class="fa-solid fa-credit-card text-mimo-muted text-base"></i>
+                    </label>
+
+                    <label class="flex items-center justify-between p-3 rounded-xl border border-mimo-border hover:border-mimo-primary cursor-pointer">
+                        <div class="flex items-center gap-3">
+                            <input type="radio" name="payMethod" class="text-mimo-primary focus:ring-mimo-primary">
+                            <span class="font-bold text-xs text-mimo-text">PayPal (USD $4.99)</span>
+                        </div>
+                        <i class="fa-brands fa-paypal text-blue-600 text-base"></i>
+                    </label>
+                </div>
+
+                <!-- Checkout Action -->
+                <button onclick="processPaymentSimulation()" class="w-full py-4 bg-mimo-primary hover:bg-mimo-primaryHover text-white font-bold rounded-2xl shadow-lg shadow-mimo-primary/25 transition text-base flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-lock"></i>
+                    <span>Pagar y Publicar Mi Página ($4,990 ARS)</span>
+                </button>
+
+                <p class="text-[11px] text-center text-mimo-muted">🔒 Pago 100% seguro y encriptado. Recibirás tu enlace de inmediato.</p>
+            </div>
+
+            <!-- Payment Loading / Success Simulation Modal -->
+            <div id="paymentModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden">
+                <div class="bg-white rounded-3xl max-w-sm w-full p-8 text-center shadow-2xl space-y-4">
+                    <div id="paymentSpinner" class="py-6 space-y-4">
+                        <div class="w-16 h-16 border-4 border-mimo-primary/30 border-t-mimo-primary rounded-full animate-spin mx-auto"></div>
+                        <h3 class="font-serif font-bold text-xl text-mimo-text">Procesando Pago...</h3>
+                        <p class="text-xs text-mimo-muted">Conectando de forma segura con la pasarela de cobro...</p>
+                    </div>
+
+                    <div id="paymentSuccess" class="hidden py-4 space-y-4">
+                        <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-3xl mx-auto">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+                        <h3 class="font-serif font-bold text-2xl text-mimo-text">¡Pago Aprobado!</h3>
+                        <p class="text-xs text-mimo-muted">Tu regalo digital ha sido publicado exitosamente.</p>
+                        <button onclick="finishAndShowPublishedPage()" class="w-full py-3 bg-mimo-primary text-white rounded-xl font-bold text-sm">
+                            Ver Mi Página Publicada 🎉
+                        </button>
+                    </div>
+                </div>
+            </div>
+            `;
+        }
+
+        function processPaymentSimulation() {
+            const modal = document.getElementById('paymentModal');
+            const spinner = document.getElementById('paymentSpinner');
+            const success = document.getElementById('paymentSuccess');
+
+            modal.classList.remove('hidden');
+            spinner.classList.remove('hidden');
+            success.classList.add('hidden');
+
+            setTimeout(() => {
+                spinner.classList.add('hidden');
+                success.classList.remove('hidden');
+                confetti({
+                    particleCount: 100,
+                    spread: 80,
+                    origin: { y: 0.5 }
+                });
+            }, 2500);
+        }
+
+        function finishAndShowPublishedPage() {
+            appState.isPaid = true;
+            appState.step = 14;
+            renderStep();
+        }
+
+        function renderPublishedPage() {
+            const themeClass = `theme-${appState.selectedTheme}`;
+            const photoGallery = appState.photos.map(p => `
+                <div class="aspect-square rounded-2xl overflow-hidden shadow-md border border-white/40 group hover:scale-[1.02] transition">
+                    <img src="${p}" class="w-full h-full object-cover">
+                </div>
+            `).join('');
+
+            const reasonsList = appState.reasons.map(r => `
+                <li class="flex items-center gap-3 p-3 bg-white/80 backdrop-blur-xs rounded-xl shadow-xs border border-mimo-border">
+                    <span class="text-mimo-primary"><i class="fa-solid fa-heart"></i></span>
+                    <span class="text-sm font-medium text-mimo-text">${r}</span>
+                </li>
+            `).join('');
+
+            const plansList = appState.plans.map(p => `
+                <li class="flex items-center gap-3 p-3 bg-white/80 backdrop-blur-xs rounded-xl shadow-xs border border-mimo-border">
+                    <input type="checkbox" class="w-4 h-4 text-mimo-primary border-mimo-border rounded focus:ring-mimo-primary">
+                    <span class="text-sm font-medium text-mimo-text">${p}</span>
+                </li>
+            `).join('');
+
+            const vouchersCards = appState.vouchers.map((v, i) => `
+                <div id="voucherPublished_${i}" onclick="redeemVoucher(${i})" class="p-4 bg-white rounded-2xl border-2 border-dashed border-mimo-primary/40 shadow-sm cursor-pointer hover:scale-[1.02] transition flex items-center justify-between">
+                    <span class="text-xs font-bold text-mimo-text">${v}</span>
+                    <span class="text-[10px] font-bold uppercase bg-mimo-secondary text-mimo-primary px-2 py-1 rounded-full shrink-0">Canjear</span>
+                </div>
+            `).join('');
+
+            const memoriesTimeline = appState.memories.map(m => `
+                <div class="relative pl-6 border-l-2 border-mimo-primary pb-6 space-y-1">
+                    <div class="absolute -left-[7px] top-0 w-3 h-3 rounded-full bg-mimo-primary"></div>
+                    <span class="text-xs font-bold text-mimo-primary uppercase">${m.date}</span>
+                    <h4 class="font-serif font-bold text-base text-mimo-text">${m.title}</h4>
+                    <p class="text-xs text-mimo-muted leading-relaxed">${m.desc}</p>
+                </div>
+            `).join('');
+
+            return `
+            <div class="${themeClass} fade-in max-w-2xl mx-auto pb-20 space-y-8">
+                <!-- Top Creator Sticky Banner -->
+                <div class="bg-slate-900 text-white p-3 rounded-2xl shadow-xl flex items-center justify-between text-xs">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                        <span class="font-bold">¡Página En Vivo y Publicada!</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="copyPublishedLink()" class="bg-mimo-primary text-white px-3 py-1.5 rounded-lg font-bold hover:bg-mimo-primaryHover transition">
+                            <i class="fa-solid fa-link mr-1"></i> Copiar Enlace
+                        </button>
+                        <button onclick="goToStep(1)" class="bg-white/20 text-white px-3 py-1.5 rounded-lg font-bold hover:bg-white/30 transition">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Published Hero Header -->
+                <div class="text-center space-y-3 pt-4">
+                    <span class="text-xs font-bold uppercase tracking-widest text-mimo-primary bg-mimo-secondary px-4 py-1.5 rounded-full">
+                        ${appState.recipient === 'pareja' ? '❤️ Nuestro Amor Eterno' : '🌷 Para la Mejor Mamá'}
+                    </span>
+                    <h1 class="text-4xl sm:text-5xl font-serif font-bold text-mimo-text tracking-tight">
+                        ${appState.senderName} & ${appState.recipientName}
+                    </h1>
+                </div>
+
+                <!-- Live Ticking Clock Box -->
+                <div class="bg-white/90 backdrop-blur-md p-6 rounded-3xl border border-mimo-border shadow-md text-center space-y-3">
+                    <span class="text-xs font-bold uppercase tracking-wider text-mimo-muted">
+                        ${appState.recipient === 'pareja' ? 'Tiempo amándonos' : 'Tiempo compartiendo momentos'}
+                    </span>
+                    <div class="grid grid-cols-3 sm:grid-cols-6 gap-2" id="publishedTickerGrid">
+                        <!-- Dynamic ticker -->
+                    </div>
+                </div>
+
+                <!-- Photo Gallery Grid -->
+                <div class="space-y-2">
+                    <h3 class="font-serif font-bold text-xl text-mimo-text text-center">Nuestros Recuerdos</h3>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        ${photoGallery}
+                    </div>
+                </div>
+
+                <!-- Letter Box -->
+                <div class="bg-white/90 backdrop-blur-md p-8 rounded-3xl border border-mimo-border shadow-md space-y-4 text-center relative overflow-hidden">
+                    <i class="fa-solid fa-quote-left text-4xl text-mimo-secondary absolute top-4 left-4 -z-0"></i>
+                    <h3 class="font-serif font-bold text-2xl text-mimo-text relative z-10">Carta para Ti</h3>
+                    <p class="font-serif text-base text-mimo-text leading-relaxed whitespace-pre-line italic relative z-10">
+                        "${escapeHtml(appState.letter)}"
+                    </p>
+                    <div class="pt-2 text-right">
+                        <span class="font-serif font-bold text-sm text-mimo-primary block">Con todo mi amor,</span>
+                        <span class="font-serif font-bold text-lg text-mimo-text">${appState.senderName}</span>
+                    </div>
+                </div>
+
+                <!-- What I Love Most / Reasons -->
+                <div class="space-y-3">
+                    <h3 class="font-serif font-bold text-xl text-mimo-text text-center">
+                        ${appState.recipient === 'pareja' ? 'Lo que más amo de ti' : 'Lo que más le agradezco a Mamá'}
+                    </h3>
+                    <ul class="space-y-2">
+                        ${reasonsList}
+                    </ul>
+                </div>
+
+                <!-- Future Plans -->
+                <div class="space-y-3">
+                    <h3 class="font-serif font-bold text-xl text-mimo-text text-center">Planes Futuros por Cumplir</h3>
+                    <ul class="space-y-2">
+                        ${plansList}
+                    </ul>
+                </div>
+
+                <!-- Redeemable Vouchers -->
+                <div class="space-y-3">
+                    <h3 class="font-serif font-bold text-xl text-mimo-text text-center">Tus Vales de Regalo Canjeables</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        ${vouchersCards}
+                    </div>
+                </div>
+
+                <!-- Timeline Memories -->
+                <div class="bg-white/90 backdrop-blur-md p-6 rounded-3xl border border-mimo-border shadow-md space-y-4">
+                    <h3 class="font-serif font-bold text-xl text-mimo-text text-center">Línea del Tiempo</h3>
+                    <div class="space-y-1">
+                        ${memoriesTimeline}
+                    </div>
+                </div>
+
+                <!-- Final Interactive Question Card -->
+                <div class="bg-gradient-to-br from-mimo-secondary to-rose-100 p-8 rounded-3xl border border-mimo-border shadow-lg text-center space-y-6 relative overflow-hidden">
+                    <h3 class="font-serif font-bold text-2xl sm:text-3xl text-mimo-text">${escapeHtml(appState.finalQuestion)}</h3>
+                    <div class="flex items-center justify-center gap-4 relative min-h-[50px]">
+                        <button onclick="triggerFinalYesConfetti()" class="px-8 py-3 bg-mimo-primary text-white font-bold rounded-2xl shadow-lg hover:scale-110 transition text-lg">
+                            ¡Sí! ❤️
+                        </button>
+                        <button id="publishedBtnNo" onmouseover="runawayPublishedNoButton()" onclick="runawayPublishedNoButton()" class="px-8 py-3 bg-white text-mimo-muted font-bold rounded-2xl shadow-sm transition-all duration-200 text-lg">
+                            No
+                        </button>
+                    </div>
+                </div>
+            </div>
+            `;
+        }
+
+        function initLiveTickerPublished() {
+            if (appState.tickerInterval) clearInterval(appState.tickerInterval);
+            updateTickerPublished();
+            appState.tickerInterval = setInterval(updateTickerPublished, 1000);
+        }
+
+        function updateTickerPublished() {
+            const grid = document.getElementById('publishedTickerGrid');
+            if (!grid || !appState.startDate) return;
+
+            const diff = calculateTimeDiff(new Date(appState.startDate));
+            grid.innerHTML = `
+                <div class="bg-mimo-bg p-2 rounded-xl border border-mimo-border"><span class="text-lg font-bold text-mimo-text block">${diff.years}</span><span class="text-[10px] text-mimo-muted uppercase">Años</span></div>
+                <div class="bg-mimo-bg p-2 rounded-xl border border-mimo-border"><span class="text-lg font-bold text-mimo-text block">${diff.months}</span><span class="text-[10px] text-mimo-muted uppercase">Meses</span></div>
+                <div class="bg-mimo-bg p-2 rounded-xl border border-mimo-border"><span class="text-lg font-bold text-mimo-text block">${diff.days}</span><span class="text-[10px] text-mimo-muted uppercase">Días</span></div>
+                <div class="bg-mimo-bg p-2 rounded-xl border border-mimo-border"><span class="text-lg font-bold text-mimo-text block">${diff.hours}</span><span class="text-[10px] text-mimo-muted uppercase">Horas</span></div>
+                <div class="bg-mimo-bg p-2 rounded-xl border border-mimo-border"><span class="text-lg font-bold text-mimo-text block">${diff.minutes}</span><span class="text-[10px] text-mimo-muted uppercase">Min</span></div>
+                <div class="bg-mimo-bg p-2 rounded-xl border border-mimo-border"><span class="text-lg font-bold text-mimo-primary block">${diff.seconds}</span><span class="text-[10px] text-mimo-muted uppercase">Seg</span></div>
+            `;
+        }
+
+        function redeemVoucher(index) {
+            const el = document.getElementById(`voucherPublished_${index}`);
+            if (el) {
+                el.className = 'p-4 bg-emerald-50 rounded-2xl border-2 border-emerald-400 shadow-sm transition flex items-center justify-between opacity-80';
+                el.innerHTML = `
+                    <span class="text-xs font-bold text-emerald-800 line-through">${appState.vouchers[index]}</span>
+                    <span class="text-[10px] font-bold uppercase bg-emerald-200 text-emerald-800 px-2 py-1 rounded-full shrink-0">¡Canjeado!</span>
+                `;
+            }
+        }
+
+        function triggerFinalYesConfetti() {
+            confetti({
+                particleCount: 150,
+                spread: 100,
+                origin: { y: 0.6 }
+            });
+            showCustomAlert("¡Inolvidable!", "Has respondido SÍ ❤️ Tu amor ha quedado grabado para siempre.");
+        }
+
+        function runawayPublishedNoButton() {
+            const btn = document.getElementById('publishedBtnNo');
+            if (!btn) return;
+            const x = (Math.random() - 0.5) * 200;
+            const y = (Math.random() - 0.5) * 80;
+            btn.style.transform = `translate(${x}px, ${y}px)`;
+        }
+
+        function copyPublishedLink() {
+            const dummyUrl = `https://mimogift.app/v/${encodeURIComponent(appState.senderName.toLowerCase())}-${encodeURIComponent(appState.recipientName.toLowerCase())}`;
+            const tempInput = document.createElement('input');
+            tempInput.value = dummyUrl;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+
+            showCustomAlert("¡Enlace Copiado!", `El enlace de tu página es:\n${dummyUrl}`);
+        }
+
+        function openQuickPreviewModal() {
+            const modal = document.getElementById('quickPreviewModal');
+            const content = document.getElementById('quickPreviewContent');
+            content.innerHTML = `
+                <div class="text-center space-y-2">
+                    <span class="text-xs font-bold uppercase tracking-wider text-mimo-primary bg-mimo-secondary px-3 py-1 rounded-full">
+                        ${PRESETS[appState.recipient].recipientLabel}
+                    </span>
+                    <h4 class="font-serif font-bold text-xl text-mimo-text">${appState.senderName || 'Tu Nombre'} & ${appState.recipientName || 'Su Nombre'}</h4>
+                    <p class="text-xs text-mimo-muted italic">" ${appState.letter ? appState.letter.substring(0, 100) + '...' : 'Carta en borrador'} "</p>
+                </div>
+
+                <div class="bg-mimo-bg p-3 rounded-xl border border-mimo-border text-xs space-y-1">
+                    <span class="font-bold text-mimo-text block">Resumen del Estado:</span>
+                    <p>• Fotos subidas: ${appState.photos.length}</p>
+                    <p>• Vales activos: ${appState.vouchers.length}</p>
+                    <p>• Tema visual: ${appState.selectedTheme}</p>
+                </div>
+            `;
+            modal.classList.remove('hidden');
+        }
+
+        function closeQuickPreviewModal() {
+            document.getElementById('quickPreviewModal').classList.add('hidden');
+        }
+
+        function showCustomAlert(title, msg) {
+            const modal = document.getElementById('customAlertModal');
+            document.getElementById('customAlertTitle').textContent = title;
+            document.getElementById('customAlertMessage').textContent = msg;
+            modal.classList.remove('hidden');
+        }
+
+        function closeCustomAlert() {
+            document.getElementById('customAlertModal').classList.add('hidden');
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, "&amp;")
+                      .replace(/</g, "&lt;")
+                      .replace(/>/g, "&gt;")
+                      .replace(/"/g, "&quot;")
+                      .replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
